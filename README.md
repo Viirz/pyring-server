@@ -327,7 +327,7 @@ This will stop containers, remove images, and clean up volumes.
 
 ## Monitoring Agents
 
-For setting up the monitoring agents that communicate with this server, see: [Pyring Agent Repository](https://github.com/placeholder/pyring-agent)
+For setting up the monitoring agents that communicate with this server, see: [Pyring Agent Repository](https://github.com/Viirz/pyring-agent)
 
 ## License
 
