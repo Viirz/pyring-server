@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Account Settings</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}" />
+</head>
+<body>
+  <header class="navbar">
+    <h1>Command Center</h1>
+    <nav>
+      <a href="{{ url_for('web.dashboard') }}" class="active">
+        <img src="{{ url_for('static', filename='img/dashboard.png') }}" alt="Dashboard Icon" class="icon"> Dashboard
+      </a>
+      <a href="{{ url_for('web.account') }}">
+        <img src="{{ url_for('static', filename='img/user.png') }}" alt="User Icon" class="icon"> User
+      </a>
+    </nav>
+  </header>
+
+  <main class="settings-container">
+    <!-- Header Row: Title, Description & Logout Button -->
+    <div class="header-row">
+      <div>
+        <h2>Account Settings</h2>
+        <p>Manage your account settings and password</p>
+      </div>
+      <!-- Logout Form -->
+      <form action="{{ url_for('users_api.logout_route') }}" method="POST" style="display: inline;">
+        <button type="submit" class="btn-logout">Logout</button>
+      </form>
+    </div>
+
+    <!-- Email Section -->
+    <div class="settings-card">
+      <label>Email Address</label>
+      <div class="email-section">
+        <span>{{ email }}</span>
+      </div>
+    </div>
+
+    <!-- Password Form -->
+    <div class="settings-card">
+      <form id="password-form">
+        <label>Current Password</label>
+        <input type="password" id="current-password" placeholder="Current Password" required />
+    
+        <label>New Password</label>
+        <input type="password" id="new-password" placeholder="New Password" required />
+    
+        <label>Confirm New Password</label>
+        <input type="password" id="confirm-password" placeholder="Confirm New Password" required />
+    
+        <button type="button" class="btn-full" onclick="updatePassword()">Update Password</button>
+      </form>
+    </div>
+
+  </main>
+</body>
+
+<script>
+  async function updatePassword() {
+    // Gather form data
+    const oldPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    // Check if new password and confirm password match
+    if (newPassword !== confirmPassword) {
+      alert('New password and confirm password do not match.');
+      return;
+    }
+
+    try {
+      // Send the data as JSON to the endpoint
+      const response = await fetch('{{ url_for("users_api.change_password_route") }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          old_password: oldPassword,
+          new_password: newPassword,
+        }),
+        credentials: 'include', // Include cookies in the request
+      });
+
+      // Handle the response
+      if (response.ok) {
+        alert('Password updated successfully!');
+        window.location.reload(); // Reload the page or redirect as needed
+      } else {
+        const errorData = await response.json();
+        alert(errorData.msg || 'Failed to update password.');
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+      alert('An error occurred. Please try again.');
+    }
+  }
+</script>
+</html>

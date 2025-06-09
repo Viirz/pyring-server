@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>Command Center</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+   </head>
+   <body>
+      <header class="navbar">
+         <h1>Command Center</h1>
+         <nav>
+            <a href="{{ url_for('web.dashboard') }}" class="active">
+            <img src="{{ url_for('static', filename='img/dashboard.png') }}" alt="Dashboard Icon" class="icon"> Dashboard
+            </a>
+            <a href="{{ url_for('web.account') }}">
+            <img src="{{ url_for('static', filename='img/user.png') }}" alt="User Icon" class="icon"> User
+            </a>
+         </nav>
+      </header>
+      <main class="dashboard">
+      <div class="cards">
+         <div class="card">
+            <p>Total Agents</p>
+            <h2>{{ counts.get('all', 0) }}</h2>
+            <span>Active monitoring</span>
+         </div>
+         <div class="card alert">
+            <p>Unreachable</p>
+            <h2>{{ counts.get(0, 0) }}</h2>
+            <span>Status: 0</span>
+         </div>
+         <div class="card ok">
+            <p>OK</p>
+            <h2>{{ counts.get(1, 0) }}</h2>
+            <span>Status: 1</span>
+         </div>
+         <div class="card recovery">
+            <p>Recovery</p>
+            <h2>{{ counts.get(2, 0) }}</h2>
+            <span>Status: 2</span>
+         </div>
+      </div>
+      <section class="agents">
+      <div class="agents-header">
+         <h3>Monitored Agents</h3>
+         <button class="filter-btn" onclick="toggleFilter()">Filter</button>
+      </div>
+      <div id="filterPanel" class="filter-panel hidden">
+         <input type="text" id="nameFilter" placeholder="Search by name" />
+         <select id="statusFilter">
+            <option value="">All Status</option>
+            <option value="ok">OK</option>
+            <option value="unreachable">Unreachable</option>
+            <option value="recovery">Recovery</option>
+         </select>
+         <button onclick="applyFilter()">Apply</button>
+      </div>
+      <table>
+         <thead>
+            <tr>
+               <th>Name</th>
+               <th>Last Handshake</th>
+               <th>Last IP Address</th>
+               <th>Status</th>
+               <th>Actions</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for agent in agents %}
+            <tr>
+               <td>{{ agent.get('name', 'N/A') }}</td>
+               <td>{{ agent.get('last_handshake', 'N/A') }}</td>
+               <td>{{ agent.get('last_ip', 'N/A') }}</td>
+               <td>
+                  <span class="status {% if agent.get('status') == 0 %}unreachable{% elif agent.get('status') == 1 %}ok{% elif agent.get('status') == 2 %}recovery{% else %}unknown{% endif %}">
+                  {% if agent.get('status') == 0 %}
+                  Unreachable
+                  {% elif agent.get('status') == 1 %}
+                  OK
+                  {% elif agent.get('status') == 2 %}
+                  Recovery
+                  {% else %}
+                  Unknown
+                  {% endif %}
+                  </span>
+               </td>
+               <td>
+                  <a href="{{ url_for('web.agent_detail', uuid=agent.get('uuid', 'null')) }}">
+                  <button class="go-btn">GO</button>
+                  </a>
+               </td>
+            </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      <!-- Tombol Add Agent -->
+      <div class="add-agent-wrapper">
+         <button class="add-agent-btn" onclick="openModal()">Add Agent</button>
+      </div>
+      </div>
+      </div>
+      
+      <!-- Modal Add Agent -->
+      <div class="modal" id="addAgentModal">
+         <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add New Agent</h2>
+            <input type="text" id="agentNameInput" placeholder="Agent Name"/>
+            <button class="submit-btn" onclick="submitAgent()">Submit</button>
+         </div>
+      </div>
+      
+      <!-- Modal Show Agent Credentials -->
+      <div class="credential-card-modal" id="agentCredentialsModal">
+         <div class="credential-card-content">
+            <div class="credential-card-header">
+               <h2>Agent Credentials</h2>
+               <button class="card-close" onclick="closeCredentialsModal()">&times;</button>
+            </div>
+            <div class="credential-card-body">
+               <div class="credential-item active" data-index="0">
+                  <div class="credential-label">Agent Private Key</div>
+                  <div class="credential-content" id="agentPrivateKey"></div>
+                  <div class="credential-actions">
+                     <button class="copy-btn" onclick="copyToClipboard('agentPrivateKey', this)">Copy</button>
+                  </div>
+               </div>
+               <div class="credential-item" data-index="1">
+                  <div class="credential-label">Server Public Key</div>
+                  <div class="credential-content" id="serverPublicKey"></div>
+                  <div class="credential-actions">
+                     <button class="copy-btn" onclick="copyToClipboard('serverPublicKey', this)">Copy</button>
+                  </div>
+               </div>
+               <div class="credential-item" data-index="2">
+                  <div class="credential-label">Agent UUID</div>
+                  <div class="credential-content" id="agentUuid"></div>
+                  <div class="credential-actions">
+                     <button class="copy-btn" onclick="copyToClipboard('agentUuid', this)">Copy</button>
+                  </div>
+               </div>
+            </div>
+            <div class="credential-navigation">
+               <button class="nav-btn" id="prevBtn" onclick="previousCredential()" disabled>Previous</button>
+               <div class="credential-indicator">
+                  <div class="indicator-dot active"></div>
+                  <div class="indicator-dot"></div>
+                  <div class="indicator-dot"></div>
+               </div>
+               <button class="nav-btn" id="nextBtn" onclick="nextCredential()">Next</button>
+            </div>
+         </div>
+      </div>
+
+      <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+   </body>
+</html>

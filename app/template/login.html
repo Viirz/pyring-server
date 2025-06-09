@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.0.0/remixicon.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+</head>
+<body>
+  <div class="auth-container">
+    <div class="login-box">
+      <h1 class="logo">PyRing</h1>
+      <h2 class="title">Sign in to your account</h2>
+      <p class="subtitle">Access your optimized monitoring dashboard</p>
+
+      <form class="form-container" onsubmit="handleLogin(event)">
+        <div class="input-group">
+          <label for="email">Email address</label>
+          <div class="input-icon">
+            <i class="ri-mail-line"></i>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <div class="input-icon">
+            <i class="ri-lock-line"></i>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <span id="togglePassword" class="toggle-icon"><i class="ri-eye-off-line"></i></span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Sign in</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Toggle password visibility
+    document.getElementById("togglePassword").addEventListener("click", function () {
+      const password = document.getElementById("password");
+      const type = password.type === "password" ? "text" : "password";
+      password.type = type;
+      this.innerHTML = type === "password"
+        ? '<i class="ri-eye-off-line"></i>'
+        : '<i class="ri-eye-line"></i>';
+    });
+
+    // Login handler (copied from your previous logic)
+    async function handleLogin(event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const response = await fetch("{{ url_for('users_api.login_route') }}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.msg); // Show success message
+          window.location.href = "{{ url_for('web.dashboard') }}"; // Redirect to dashboard
+        } else {
+          alert(result.msg); // Show error message
+        }
+      } catch (error) {
+        alert("An error occurred: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

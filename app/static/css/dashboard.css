@@ -1,0 +1,524 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7fc;
+  }
+  
+  .navbar {
+    background-color: white;
+    border-bottom: 2px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+  }
+  
+  .navbar h1 {
+    font-size: 1.5rem;
+  }
+  
+  
+  .navbar nav {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .navbar nav a {
+    position: relative;
+    display: inline-block;
+    /* padding: 8px 16px; */
+    overflow: hidden;
+    color: #333;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar nav a .icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    object-fit: contain;
+  }
+  .navbar nav a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: #dceeff;
+    z-index: -1;
+    transition: left 0.3s ease;
+  }
+  
+  .navbar nav a:hover::before {
+    left: 0;
+  }
+  
+  .navbar nav a:hover {
+    color: #0056b3;
+  }
+  
+  .navbar nav a .icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    object-fit: contain;
+  }
+  
+  .dashboard {
+    padding: 20px 32px;
+  }
+  
+  .cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .card {
+    background: white;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .card h2 {
+    margin: 10px 0;
+  }
+  
+  .card.alert {
+    border-left: 6px solid #f44336;
+  }
+  
+  .card.ok {
+    border-left: 6px solid #4caf50;
+  }
+  
+  .card.recovery {
+    border-left: 6px solid #ff9800;
+  }
+  
+  .agents {
+    margin-top: 40px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .agents-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .agents-header input {
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 200px;
+  }
+  
+  .filter-btn {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  th,
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .status.ok {
+    background-color: #4caf50;
+  }
+  
+  .status.unreachable {
+    background-color: #f44336;
+  }
+  
+  .status.recovery {
+    background-color: #ff9800;
+  }
+  
+  .go-btn {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .filter-panel {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .filter-panel input,
+  .filter-panel select {
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  
+  .filter-panel button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  .go-btn:hover,
+  .filter-btn:hover,
+  .filter-panel button:hover {
+    background-color: #333;
+    transition: background-color 0.2s ease;
+  }
+  .filter-btn:hover {
+    background-color: #007bff;
+  }
+  
+  .filter-panel button:hover {
+    background-color: #28a745;
+  }
+  
+  .add-agent-wrapper {
+    margin-top: 20px;
+    text-align: right;
+  }
+  
+  .add-agent-btn {
+    background-color: #000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+  }
+  
+  .add-agent-btn:hover {
+    background-color: #333;
+  }
+  .add-agent-wrapper {
+    margin-top: 20px;
+    text-align: right;
+  }
+  
+  .add-agent-btn {
+    background-color: #000000;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .add-agent-btn:hover {
+    background-color: #696969;
+  }
+  
+  /* Modal Styling */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-content {
+    background-color: white;
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    text-align: center;
+  }
+  
+  .modal-content h2 {
+    margin-top: 0;
+  }
+  
+  .modal-content input {
+    width: 90%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+  
+  .submit-btn {
+    margin-top: 15px;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .submit-btn:hover {
+    background-color: #218838;
+  }
+
+  .submit-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
+
+  .submit-btn.loading {
+    background-color: #6c757d;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+  }
+  
+  .close:hover {
+    color: #333;
+  }
+
+  /* Credential Card Modal */
+  .credential-card-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .credential-card-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+
+  .credential-card-header {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .credential-card-header h2 {
+    margin: 0;
+    color: #333;
+  }
+
+  .card-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-close:hover {
+    color: #333;
+  }
+
+  .credential-card-body {
+    padding: 30px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .credential-item {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .credential-item.active {
+    display: flex;
+  }
+
+  .credential-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .credential-content {
+    flex: 1;
+    background-color: #f8f9fa;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-y: auto;
+    max-height: 250px;
+    margin-bottom: 20px;
+  }
+
+  .credential-actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .copy-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+
+  .copy-btn:hover {
+    background-color: #218838;
+  }
+
+  .copy-btn.copied {
+    background-color: #17a2b8;
+  }
+
+  .credential-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 20px;
+  }
+
+  .nav-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    background-color: #5a6268;
+  }
+
+  .nav-btn:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+  }
+
+  .done-btn {
+    background-color: #007bff;
+  }
+
+  .done-btn:hover {
+    background-color: #0056b3;
+  }
+
+  .credential-indicator {
+    display: flex;
+    gap: 8px;
+  }
+
+  .indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    transition: background-color 0.2s ease;
+  }
+
+  .indicator-dot.active {
+    background-color: #007bff;
+  }

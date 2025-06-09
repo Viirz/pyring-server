@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.0.0/remixicon.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+</head>
+<body>
+  <div class="auth-container">
+    <div class="login-box">
+      <h1 class="logo">PyRing</h1>
+      <h2 class="title">Create a new account</h2>
+      <p class="subtitle">Dont forget to use a string passwod!!</p>
+
+      <form class="form-container" onsubmit="handleRegister(event)">
+        <div class="input-group">
+          <label for="name">Full Name</label>
+          <div class="input-icon">
+            <i class="ri-user-line"></i>
+            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email address</label>
+          <div class="input-icon">
+            <i class="ri-mail-line"></i>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <div class="input-icon">
+            <i class="ri-lock-line"></i>
+            <input type="password" id="password" name="password" placeholder="Create a password" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="repeat_password">Repeat Password</label>
+          <div class="input-icon">
+            <i class="ri-lock-password-line"></i>
+            <input type="password" id="repeat_password" name="repeat_password" placeholder="Repeat your password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Sign up</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    async function handleRegister(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const repeatPassword = document.getElementById("repeat_password").value;
+
+      try {
+        const response = await fetch("{{ url_for('users_api.register_route') }}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password, repeat_password: repeatPassword }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.msg);
+          window.location.href = "{{ url_for('web.login') }}";
+        } else {
+          alert(result.msg);
+        }
+      } catch (error) {
+        alert("An error occurred: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

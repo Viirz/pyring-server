@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Agent Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/agent.css') }}"/>
+  </head>
+  <body>
+    <header class="navbar">
+      <h1>Command Center</h1>
+      <nav>
+        <a href="{{ url_for('web.dashboard') }}" class="active">
+        <img src="{{ url_for('static', filename='img/dashboard.png') }}" alt="Dashboard Icon" class="icon"> Dashboard
+        <a href="{{ url_for('web.account') }}">
+        <img src="{{ url_for('static', filename='img/user.png') }}" alt="User Icon" class="icon"> User
+        </a>
+      </nav>
+    </header>
+    <main class="agent-container">
+      <section class="agent-details">
+        <h3>Agent Details</h3>
+        <div class="details-grid">
+          <div>
+            <p><strong>UUID</strong><br>{{ agent.get('uuid', 'N/A') }}</p>
+            <p><strong>Name</strong><br><span class="mono">{{ agent.get('name', 'N/A') }}</span></p>
+            <p><strong>Last Handshake</strong><br>{{ agent.get('last_handshake', 'N/A') }}</p>
+          </div>
+          <div>
+            <p><strong>Last IP Address</strong><br>{{ agent.get('last_ip', 'N/A') }}</p>
+            <p><strong>Status</strong><br>
+              {% if agent.get('status') == 1 %}
+              <span class="status-dot green"></span> OK
+              {% elif agent.get('status') == 0 %}
+              <span class="status-dot red"></span> Unreachable
+              {% elif agent.get('status') == 2 %}
+              <span class="status-dot yellow"></span> Recovery
+              {% else %}
+              <span class="status-dot"></span> N/A
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="command-exec">
+        <h3>Command Execution</h3>
+        <div class="command-box">
+          <input type="text" id="commandInput" placeholder="Enter command..." />
+          <button onclick="executeCommand()">Execute</button>
+        </div>
+        <ul id="commandList" class="command-list">
+        </ul>
+        <template id="commandTemplate">
+          <li class="command-item">
+            <div class="command">
+              <p><strong>Command:</strong></p>
+              <span class="command-text"></span>
+            </div>
+            <div class="response">
+              <p><strong>Response:</strong></p>
+              <span class="command-response"></span>
+            </div>
+          </li>
+        </template>
+      </section>
+      <script>
+        // Function to execute a command
+        async function executeCommand() {
+          const commandInput = document.getElementById("commandInput").value;
+          const agentUuid = "{{ agent.get('uuid') }}"; // Get the agent UUID from the template
+
+          if (!commandInput.trim()) {
+            alert("Please enter a command.");
+            return;
+          }
+
+          try {
+            const response = await fetch(`/api/agents/${agentUuid}/command`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                command: commandInput
+              }),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+              alert(result.msg); // Show success message
+              location.reload(); // Refresh the page
+            } else {
+              alert(result.msg); // Show error message
+            }
+          } catch (error) {
+            alert("An error occurred: " + error.message);
+          }
+        }
+
+        // Function to fetch commands
+        async function fetchCommands() {
+          const agentUuid = "{{ agent.get('uuid') }}"; // Get the agent UUID from the template
+
+          try {
+            const response = await fetch(`/api/agents/${agentUuid}/command`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (response.ok) {
+              const commands = await response.json();
+              const commandList = document.getElementById("commandList");
+              const commandTemplate = document.getElementById("commandTemplate");
+
+              commandList.innerHTML = ""; // Clear the list before updating
+
+              commands.forEach((cmd) => {
+                // Clone the template
+                const commandItem = commandTemplate.content.cloneNode(true);
+
+                // Populate the template with data
+                commandItem.querySelector(".command-text").textContent = cmd.command;
+                commandItem.querySelector(".command-response").textContent = cmd.response || "Pending";
+
+                // Append the populated template to the command list
+                commandList.appendChild(commandItem);
+              });
+            } else {
+              console.error("Failed to fetch commands:", await response.text());
+            }
+          } catch (error) {
+            console.error("An error occurred while fetching commands:", error);
+          }
+        }
+
+        // Fetch commands every 5 seconds
+        setInterval(fetchCommands, 5000);
+
+        // Initial fetch when the page loads
+        document.addEventListener("DOMContentLoaded", fetchCommands);
+      </script>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,265 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f7f7fc;
+}
+
+/* Navbar */
+.navbar {
+  background-color: white;
+  border-bottom: 2px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+}
+
+.navbar h1 {
+  font-size: 1.5rem;
+}
+
+.navbar nav {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar nav a {
+  position: relative;
+  display: inline-block;
+  /* padding: 8px 16px; */
+  overflow: hidden;
+  color: #333;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.navbar nav a .icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  object-fit: contain;
+}
+.navbar nav a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: #dceeff;
+  z-index: -1;
+  transition: left 0.3s ease;
+}
+
+.navbar nav a:hover::before {
+  left: 0;
+}
+
+.navbar nav a:hover {
+  color: #0056b3;
+}
+
+.navbar nav a .icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  object-fit: contain;
+}
+
+/* Container */
+.agent-container {
+  padding: 20px 32px;
+}
+
+/* Agent Details & Command Box */
+.agent-details,
+.command-exec {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 32px;
+}
+
+.agent-details h3,
+.command-exec h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+/* Detail Info Grid */
+.details-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+
+.details-grid p {
+  font-size: 1rem;
+  margin: 8px 0;
+}
+
+.details-grid strong {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.mono {
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  color: #444;
+}
+
+/* Status Indicator */
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: #333;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* Status Colors */
+.status-dot.green {
+  background-color: #4caf50;
+}
+.status-dot.red {
+  background-color: #f44336;
+}
+.status-dot.yellow {
+  background-color: #ff9800;
+}
+
+/* Command Input Box */
+.command-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.command-box input {
+  flex: 1;
+  min-width: 240px;
+  padding: 12px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: 'Courier New', Monaco, 'Lucida Console', monospace;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+.command-box input:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+}
+
+.command-box button {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.command-box button:hover {
+  background-color: #005a9e;
+}
+
+/* Command List */
+.command-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.command-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  border-left: 4px solid #007acc;
+}
+
+.command-item .command {
+  text-align: right;
+  align-self: flex-end;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: #333;
+  background-color: #e8f4f8;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1e7dd;
+}
+
+.command-item .command .command-text {
+  font-family: 'Courier New', Monaco, 'Lucida Console', monospace;
+  font-weight: 500;
+  color: #0066cc;
+  background-color: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  display: inline-block;
+}
+
+.command-item .response {
+  text-align: left;
+  align-self: flex-start;
+  font-size: 0.95rem;
+  color: #555;
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.command-item .response .command-response {
+  font-family: 'Courier New', Monaco, 'Lucida Console', monospace;
+  font-size: 0.9rem;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.5;
+  background-color: #f8f9fa;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  display: block;
+  overflow-x: auto;
+}
+
+.command-item p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.command-item strong {
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 4px;
+  display: block;
+}
