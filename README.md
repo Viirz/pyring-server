@@ -69,8 +69,8 @@ Pyring Server is a web-based command and control platform designed for managing 
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd Task_Force/server
+   git clone https://github.com/Viirz/pyring-server.git
+   cd pyring-server
    ```
 
 2. **Run the installation script**
@@ -331,8 +331,4 @@ For setting up the monitoring agents that communicate with this server, see: [Py
 
 ## License
 
-[Add your license information here]
-
 ## Support
-
-[Add support contact information here]
