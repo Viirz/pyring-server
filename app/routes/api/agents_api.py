@@ -1,12 +1,13 @@
 from flask import Blueprint, jsonify, request
-from app.services.db_service import insert_command, get_top_commands_by_uuid
+from app.services.db_service import insert_command, get_top_commands_by_uuid, get_user_by_email
 from app.utils.jwt_utils import verify_jwt
-from app.utils.agent_utils import add_agents
+from app.utils.agent_utils import add_agents, delete_agent
 import uuid as uuid_gen
 import time
 from shlex import split
 import os
 from app.utils.pgp_utils import AGENT_PGP_DIR, gpg, get_server_public_key
+from argon2 import PasswordHasher, exceptions as argon2_exceptions
 
 agents_api_bp = Blueprint('agents_api', __name__, url_prefix='/api/agents')
 
@@ -109,5 +110,46 @@ def handle_agent_command(uuid):
             
             return jsonify({"msg": "Command added successfully"}), 201
 
+    except Exception as e:
+        return jsonify({"msg": f"Something went wrong: {e}"}), 500
+
+@agents_api_bp.route('/<uuid>', methods=['DELETE'])
+def delete_agent_endpoint(uuid):
+    try:
+        # Get current user from JWT
+        token = request.cookies.get('token')
+        decoded_token = verify_jwt(token)
+        
+        if not token or not decoded_token:
+            return jsonify({"msg": "Unauthorized"}), 401
+
+        email = decoded_token.get('email') if decoded_token else None
+        if not email:
+            return jsonify({"msg": "Email not found in token"}), 401
+        
+        # Get the password from request body
+        data = request.get_json()
+        if not data:
+            return jsonify({"msg": "Password is required"}), 400
+            
+        password = data.get("password")
+        if not password:
+            return jsonify({"msg": "Password is required"}), 400
+        
+        # Verify admin password
+        user = get_user_by_email(email)
+        if not user:
+            return jsonify({"msg": "User not found"}), 404
+        
+        ph = PasswordHasher()
+        try:
+            ph.verify(user['password'], password)
+        except argon2_exceptions.VerifyMismatchError:
+            return jsonify({"msg": "Invalid password"}), 401
+        
+        # Delete the agent
+        result, status = delete_agent(uuid)
+        return jsonify(result), status
+        
     except Exception as e:
         return jsonify({"msg": f"Something went wrong: {e}"}), 500

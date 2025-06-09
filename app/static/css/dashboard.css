@@ -177,6 +177,21 @@ body {
     cursor: pointer;
   }
   
+  .delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c82333;
+  }
+  
   .filter-panel {
     margin-bottom: 16px;
     display: flex;
@@ -317,6 +332,49 @@ body {
 
   .submit-btn.loading {
     background-color: #6c757d;
+  }
+
+  /* Delete Modal Styles */
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .cancel-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+
+  .cancel-btn:hover {
+    background-color: #5a6268;
+  }
+
+  .delete-confirm-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+
+  .delete-confirm-btn:hover {
+    background-color: #c82333;
+  }
+
+  .delete-confirm-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
   }
 
   /* Loading spinner */

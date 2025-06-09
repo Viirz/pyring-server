@@ -1,4 +1,5 @@
-from app.services.db_service import insert_uuid, get_agents, update_agents
+from app.services.db_service import insert_uuid, get_agents, update_agents, delete_agent_by_uuid
+from app.utils.pgp_utils import delete_agent_pgp_keys
 from datetime import datetime, timedelta
 import uuid
 
@@ -37,3 +38,18 @@ def check_and_update_agent_status():
                     update_agents(agent)  # Update the agent in the database
     except Exception as e:
         print(f"Error updating agent status: {e}")
+
+def delete_agent(agent_uuid: str):
+    """Delete agent and all associated data"""
+    try:
+        # Delete from database
+        result = delete_agent_by_uuid(agent_uuid)
+        if isinstance(result, Exception):
+            raise result
+            
+        # Delete PGP keys
+        delete_agent_pgp_keys(agent_uuid)
+        
+        return {"msg": "Agent deleted successfully"}, 200
+    except Exception as e:
+        return {"msg": f"Error deleting agent: {str(e)}"}, 500

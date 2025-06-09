@@ -8,7 +8,7 @@ services:
     container_name: flask
     restart: unless-stopped
     environment:
-      USE_GUNICORN: "true"
+      USE_GUNICORN: "false"
       MONGODB_DATABASE: flaskdb
       MONGODB_USERNAME: mongodbuser
       MONGODB_PASSWORD: mongo123

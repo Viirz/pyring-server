@@ -25,14 +25,16 @@ function applyFilter() {
 }
 
 // Modal elements and variables
-let modal, credentialsModal;
+let modal, credentialsModal, deleteModal;
 let currentCredentialIndex = 0;
 let credentialData = null;
+let agentToDelete = null;
 
 // Initialize modal elements when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   modal = document.getElementById("addAgentModal");
   credentialsModal = document.getElementById("agentCredentialsModal");
+  deleteModal = document.getElementById("deleteAgentModal");
   
   // Setup modal click outside to close
   window.onclick = function (e) {
@@ -41,6 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (e.target == credentialsModal) {
       closeCredentialsModal();
+    }
+    if (e.target == deleteModal) {
+      closeDeleteModal();
     }
   }
 });
@@ -76,6 +81,71 @@ function closeCredentialsModal() {
   credentialsModal.style.display = 'none';
   currentCredentialIndex = 0;
   credentialData = null;
+}
+
+// Delete Agent Modal functions
+function openDeleteModal(agentUuid, agentName) {
+  agentToDelete = {
+    uuid: agentUuid,
+    name: agentName
+  };
+  
+  document.getElementById("deleteAgentText").textContent = 
+    `Are you sure you want to delete agent "${agentName}"? This action cannot be undone.`;
+  document.getElementById("adminPasswordInput").value = "";
+  
+  deleteModal.style.display = "block";
+}
+
+function closeDeleteModal() {
+  deleteModal.style.display = "none";
+  agentToDelete = null;
+  document.getElementById("adminPasswordInput").value = "";
+}
+
+async function confirmDeleteAgent() {
+  if (!agentToDelete) {
+    alert("No agent selected for deletion.");
+    return;
+  }
+  
+  const password = document.getElementById("adminPasswordInput").value;
+  if (!password.trim()) {
+    alert("Please enter your admin password.");
+    return;
+  }
+  
+  const deleteButton = document.querySelector(".delete-confirm-btn");
+  const originalButtonText = deleteButton.textContent;
+  
+  try {
+    // Disable button and show loading state
+    deleteButton.disabled = true;
+    deleteButton.textContent = "Deleting...";
+    
+    const response = await fetch(`/api/agents/${agentToDelete.uuid}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert(`Agent "${agentToDelete.name}" deleted successfully.`);
+      closeDeleteModal();
+      location.reload(); // Refresh the page
+    } else {
+      alert(result.msg); // Show error message
+    }
+  } catch (error) {
+    alert("An error occurred: " + error.message);
+  } finally {
+    // Reset button state
+    deleteButton.disabled = false;
+    deleteButton.textContent = originalButtonText;
+  }
 }
 
 // Credential navigation functions

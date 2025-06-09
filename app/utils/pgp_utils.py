@@ -81,3 +81,25 @@ def sign_and_encrypt_command(command_data, agent_uuid):
     if not encrypted.ok:
         raise Exception(f"Encryption/signing failed: {encrypted.stderr}")
     return str(encrypted)
+
+def delete_agent_pgp_keys(agent_uuid):
+    """Delete agent's PGP keys from keyring and file system"""
+    try:
+        # Get the agent's fingerprint before deleting files
+        agent_fingerprint = get_agent_fingerprint(agent_uuid)
+        
+        # Delete the public key file
+        pub_path = os.path.join(AGENT_PGP_DIR, f"{agent_uuid}_pub.asc")
+        if os.path.exists(pub_path):
+            os.remove(pub_path)
+        
+        # Delete the key from GPG keyring if it exists
+        if agent_fingerprint:
+            try:
+                # Delete the key from keyring
+                gpg.delete_keys(agent_fingerprint)
+            except Exception as e:
+                print(f"Warning: Could not delete key from keyring: {e}")
+                
+    except Exception as e:
+        raise Exception(f"Failed to delete PGP keys: {e}")

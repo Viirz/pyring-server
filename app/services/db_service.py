@@ -153,3 +153,21 @@ def remove_expired_blacklisted_tokens():
         db.blacklist_jwt.delete_many({"exp_time": {"$lt": now}})
     except Exception as e:
         return e
+
+def delete_agent_by_uuid(uuid: str):
+    try:
+        if not uuid_exists(uuid):
+            raise Exception("UUID not found")
+        
+        # Delete agent from agents collection
+        db.agents.delete_one({"uuid": uuid})
+        
+        # Delete all commands for this agent
+        db.commands.delete_many({"uuid": uuid})
+        
+        # Delete all logs for this agent
+        db.logs.delete_many({"uuid": uuid})
+        
+        return True
+    except Exception as e:
+        return e

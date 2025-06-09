@@ -89,6 +89,7 @@
                   <a href="{{ url_for('web.agent_detail', uuid=agent.get('uuid', 'null')) }}">
                   <button class="go-btn">GO</button>
                   </a>
+                  <button class="delete-btn" data-uuid="{{ agent.get('uuid', '') }}" data-name="{{ agent.get('name', 'N/A') }}" onclick="openDeleteModal(this.dataset.uuid, this.dataset.name)">Delete</button>
                </td>
             </tr>
             {% endfor %}
@@ -98,8 +99,8 @@
       <div class="add-agent-wrapper">
          <button class="add-agent-btn" onclick="openModal()">Add Agent</button>
       </div>
-      </div>
-      </div>
+      </section>
+      </main>
       
       <!-- Modal Add Agent -->
       <div class="modal" id="addAgentModal">
@@ -108,6 +109,20 @@
             <h2>Add New Agent</h2>
             <input type="text" id="agentNameInput" placeholder="Agent Name"/>
             <button class="submit-btn" onclick="submitAgent()">Submit</button>
+         </div>
+      </div>
+      
+      <!-- Modal Delete Agent -->
+      <div class="modal" id="deleteAgentModal">
+         <div class="modal-content">
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+            <h2>Delete Agent</h2>
+            <p id="deleteAgentText">Are you sure you want to delete this agent?</p>
+            <input type="password" id="adminPasswordInput" placeholder="Enter admin password" required/>
+            <div class="modal-buttons">
+               <button class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+               <button class="delete-confirm-btn" onclick="confirmDeleteAgent()">Delete</button>
+            </div>
          </div>
       </div>
       
