@@ -171,3 +171,23 @@ def delete_agent_by_uuid(uuid: str):
         return True
     except Exception as e:
         return e
+
+# Telegram notification functions
+def get_telegram_settings():
+    try:
+        settings = db.telegram_settings.find_one({}, {"_id": 0})
+        return settings
+    except Exception as e:
+        return None
+
+def update_telegram_settings(settings_data: dict):
+    try:
+        # Use upsert to update or create if doesn't exist
+        db.telegram_settings.update_one(
+            {},  # Empty filter to match any document
+            {"$set": settings_data},
+            upsert=True
+        )
+        return True
+    except Exception as e:
+        return e

@@ -43,16 +43,12 @@ def verify_and_decrypt_status(encrypted_data, agent_uuid):
     if not decrypted.ok:
         raise Exception("Decryption failed")
     
-    print(f"Decrypted message: {decrypted.data}", flush=True)
-    
     # For signed and encrypted messages, the signature info is available in the decrypted object
     if decrypted.valid:
-        print(f"Signature verification: {decrypted.valid}, fingerprint: {decrypted.fingerprint}", flush=True)
         verified_fingerprint = decrypted.fingerprint
     else:
         # Fallback: try to verify the decrypted data separately
         verified = gpg.verify(decrypted.data)
-        print(f"Fallback verification result: {verified.valid}, fingerprint: {verified.fingerprint}", flush=True)
         verified_fingerprint = verified.fingerprint if verified.valid else None
     
     if not verified_fingerprint:

@@ -3,6 +3,7 @@ import time, json
 from app.utils.request_utils import sanitize_input, validate_request_data
 from app.services.db_service import update_agents, get_unretrieved_commands_by_uuid, update_command_response
 from app.utils.pgp_utils import verify_and_decrypt_status, sign_and_encrypt_command
+from app.utils.agent_utils import update_agent_with_notification
 
 agents_bp = Blueprint('agents', __name__)
 
@@ -16,7 +17,6 @@ def receive_status():
         decrypted_json = verify_and_decrypt_status(encrypted_data, agent_uuid)
         request_data = json.loads(decrypted_json.strip())
         
-        print(f"Received request data: {request_data}", flush=True)
         if not request_data:
             raise ValueError("Request data is required")
         
@@ -41,7 +41,9 @@ def receive_status():
                     
             validate_request_data(request_data, required_fields)
             sanitized_data = sanitize_input(request_data)
-            update_agents(sanitized_data)
+            
+            # Use the new function with notifications
+            update_agent_with_notification(sanitized_data)
                         
         elif status == 5: # Agent request for commands
             required_fields = {

@@ -1,5 +1,6 @@
-from app.services.db_service import insert_uuid, get_agents, update_agents, delete_agent_by_uuid
+from app.services.db_service import insert_uuid, get_agents, update_agents, delete_agent_by_uuid, get_agents_by_uuid
 from app.utils.pgp_utils import delete_agent_pgp_keys
+from app.utils.telegram_utils import send_telegram_notification
 from datetime import datetime, timedelta
 import uuid
 
@@ -22,6 +23,35 @@ def add_agents(name: str):
     
     except Exception as e:
         return {"msg": f"Error adding status: {str(e)}"}, 500
+
+def update_agent_with_notification(agent_data):
+    """Update agent and send notification if status changed"""
+    try:
+        agent_uuid = agent_data.get("uuid")
+        new_status = agent_data.get("status")
+        
+        # Get current agent data to compare status
+        current_agent = get_agents_by_uuid(agent_uuid)
+        if not current_agent:
+            raise Exception("Agent not found")
+        
+        old_status = current_agent.get("status")
+        agent_name = current_agent.get("name", "Unknown")
+        
+        # Update the agent
+        result = update_agents(agent_data)
+        if isinstance(result, Exception):
+            raise result
+        
+        # Send notification if status actually changed
+        if old_status is not None and old_status != new_status:
+            print(f"Agent {agent_name} status changed: {old_status} -> {new_status}", flush=True)
+            send_telegram_notification(agent_name, agent_uuid, old_status, new_status)
+        
+        return True
+    except Exception as e:
+        print(f"Error updating agent with notification: {e}", flush=True)
+        return e
     
 def check_and_update_agent_status():
     try:
@@ -30,12 +60,20 @@ def check_and_update_agent_status():
 
         for agent in agents:
             last_handshake = agent.get("last_handshake")
-            if last_handshake:
-                last_handshake_time = datetime.fromtimestamp(last_handshake)
-                if (current_time - last_handshake_time) > timedelta(minutes=5):
-                    # Update agent status to 0 (Unreachable)
-                    agent["status"] = 0
-                    update_agents(agent)  # Update the agent in the database
+            if not last_handshake:
+                continue
+            
+            last_handshake_time = datetime.fromtimestamp(last_handshake)
+            if (current_time - last_handshake_time) <= timedelta(minutes=5):
+                continue
+            
+            # Only update if status is not already 0
+            if agent.get("status") == 0:
+                continue
+            
+            agent["status"] = 0
+            update_agent_with_notification(agent)
+    
     except Exception as e:
         print(f"Error updating agent status: {e}")
 

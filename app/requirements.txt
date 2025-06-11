@@ -5,3 +5,4 @@ PyJWT==2.10.0
 APScheduler==3.11.0
 python-gnupg==0.5.4
 gunicorn==21.2.0
+requests==2.31.0
