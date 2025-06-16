@@ -94,17 +94,20 @@
 <script>
   // Global variable to track if settings are configured
   let telegramConfigured = false;
+  let isLoadingSettings = false; // Flag to prevent auto-save during loading
 
   // Load Telegram settings on page load
   document.addEventListener('DOMContentLoaded', function() {
-    // Add event listener for toggle BEFORE loading settings
-    document.getElementById('telegram-enabled').addEventListener('change', toggleTelegramConfig);
-    
-    // Load settings after event listener is set up
-    loadTelegramSettings();
+    // Add event listener for toggle AFTER loading settings
+    loadTelegramSettings().then(() => {
+      // Add the event listener after settings are loaded
+      document.getElementById('telegram-enabled').addEventListener('change', onToggleChange);
+    });
   });
 
   async function loadTelegramSettings() {
+    isLoadingSettings = true; // Set flag to prevent auto-save
+    
     try {
       const response = await fetch('/api/telegram/settings', {
         method: 'GET',
@@ -132,7 +135,7 @@
         // Set chat ID
         document.getElementById('chat-id').value = settings.chat_id || '';
         
-        // IMPORTANT: Update UI visibility AFTER setting the checkbox value
+        // Update UI visibility AFTER setting the checkbox value
         toggleTelegramConfig();
         
         console.log('Telegram settings loaded:', {
@@ -149,7 +152,27 @@
       console.error('Error loading Telegram settings:', error);
       // Still call toggleTelegramConfig to ensure proper initial state
       toggleTelegramConfig();
+    } finally {
+      isLoadingSettings = false; // Clear the flag
     }
+  }
+
+  function onToggleChange() {
+    // Don't auto-save if we're currently loading settings
+    if (isLoadingSettings) {
+      return;
+    }
+    
+    const enabled = document.getElementById('telegram-enabled').checked;
+    
+    // Update UI visibility
+    toggleTelegramConfig();
+    
+    // Only auto-save when DISABLING notifications
+    if (!enabled) {
+      autoSaveDisableNotifications();
+    }
+    // When enabling, just show the config section - user must click Save Settings
   }
 
   function toggleTelegramConfig() {
@@ -163,6 +186,51 @@
       config.style.animation = 'fadeIn 0.3s ease-in';
     } else {
       config.style.display = 'none';
+    }
+  }
+
+  async function autoSaveDisableNotifications() {
+    try {
+      // When disabling, we preserve existing credentials but set enabled = false
+      const botToken = document.getElementById('bot-token').value;
+      const chatId = document.getElementById('chat-id').value;
+
+      const response = await fetch('/api/telegram/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          enabled: false,  // Always false when auto-saving disable
+          bot_token: botToken,
+          chat_id: chatId
+        }),
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        console.log('Telegram notifications disabled automatically');
+        // Show a subtle notification
+        const toggle = document.querySelector('.toggle-label span');
+        const originalText = toggle.textContent;
+        toggle.textContent = 'Notifications Disabled';
+        setTimeout(() => {
+          toggle.textContent = originalText;
+        }, 2000);
+      } else {
+        const result = await response.json();
+        console.error('Auto-save disable failed:', result.msg);
+        // Revert the checkbox if save failed
+        document.getElementById('telegram-enabled').checked = true;
+        toggleTelegramConfig();
+        alert('Failed to disable notifications: ' + result.msg);
+      }
+    } catch (error) {
+      console.error('Error auto-disabling Telegram settings:', error);
+      // Revert the checkbox if save failed
+      document.getElementById('telegram-enabled').checked = true;
+      toggleTelegramConfig();
+      alert('Error disabling notifications. Please try again.');
     }
   }
 

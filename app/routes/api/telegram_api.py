@@ -42,7 +42,7 @@ def update_settings():
         bot_token = data.get("bot_token", "").strip()
         chat_id = data.get("chat_id", "").strip()
         
-        # Validate required fields if enabling
+        # Only validate required fields if enabling notifications
         if enabled and (not bot_token or not chat_id):
             return jsonify({"msg": "Bot token and chat ID are required when enabling notifications"}), 400
         
@@ -53,6 +53,16 @@ def update_settings():
                 bot_token = current_settings["bot_token"]
             else:
                 return jsonify({"msg": "No bot token configured"}), 400
+        
+        # If disabling, preserve existing credentials
+        if not enabled:
+            current_settings = get_telegram_settings()
+            if current_settings:
+                # Keep existing credentials when disabling
+                if not bot_token or bot_token == "***CONFIGURED***":
+                    bot_token = current_settings.get("bot_token", "")
+                if not chat_id:
+                    chat_id = current_settings.get("chat_id", "")
         
         settings_data = {
             "enabled": enabled,

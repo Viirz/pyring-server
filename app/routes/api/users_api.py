@@ -101,10 +101,11 @@ def register_route():
             return jsonify({"msg": "No data provided"}), 400
 
         email = data.get("email")
+        name = data.get("name")
         password = data.get("password")
         repeat_password = data.get("repeat_password")
         
-        if not email or not password or not repeat_password:
+        if not email or not name or not password or not repeat_password:
             return jsonify({"msg": "Email, password and repeat password are required"}), 400
         
         if password != repeat_password:
@@ -121,6 +122,7 @@ def register_route():
         # Call the add_user function to create a new user
         user_data = {
             "email": email,
+            "name": name,
             "password": password_hash
         }
         add_user(user_data)
