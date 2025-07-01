@@ -1,8 +1,19 @@
 from flask import Blueprint, request, render_template, redirect, url_for, make_response, jsonify
 from app.services.db_service import get_user, get_agents, get_agents_by_uuid, get_user_by_email
 from app.utils.jwt_utils import verify_jwt, blacklist_token
+from app.utils.logging_utils import log_request_blueprint, log_response_blueprint
+import logging
 
 web_bp = Blueprint('web', __name__)
+logger = logging.getLogger('pyring.web')
+
+@web_bp.before_request
+def log_web_request():
+    log_request_blueprint('pyring.web')
+
+@web_bp.after_request
+def log_web_response(response):
+    return log_response_blueprint(response, 'pyring.web')
 
 @web_bp.route('/')
 def index():

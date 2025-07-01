@@ -1,9 +1,13 @@
 from flask import Flask
+from app.utils.logging_utils import setup_logging
 
 def create_app():
     app = Flask(__name__, template_folder='template', static_folder='static')
     
-    # Import and register blueprints
+    # Setup logging
+    setup_logging()
+    
+    # Import and register blueprints (logging hooks are now in each blueprint)
     from app.routes.agents_routes import agents_bp
     from app.routes.logs_routes import logs_bp
     from app.routes.web_routes import web_bp

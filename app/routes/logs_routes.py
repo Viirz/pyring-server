@@ -4,8 +4,19 @@ import time
 from app.utils.request_utils import sanitize_input, validate_request_data
 from app.services.db_service import insert_logs
 from app.utils.pgp_utils import verify_and_decrypt_status, sign_and_encrypt_command
+from app.utils.logging_utils import log_request_blueprint, log_response_blueprint
+import logging
 
 logs_bp = Blueprint('logs', __name__)
+logger = logging.getLogger('pyring.agent.logs')
+
+@logs_bp.before_request
+def log_agent_request():
+    log_request_blueprint('pyring.agent')
+
+@logs_bp.after_request
+def log_agent_response(response):
+    return log_response_blueprint(response, 'pyring.agent')
 
 @logs_bp.route('/logs', methods=['POST'])
 def receive_logs():

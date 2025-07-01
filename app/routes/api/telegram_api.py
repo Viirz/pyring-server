@@ -2,8 +2,19 @@ from flask import Blueprint, jsonify, request
 from app.services.db_service import get_telegram_settings, update_telegram_settings, get_user_by_email
 from app.utils.jwt_utils import verify_jwt
 from app.utils.telegram_utils import test_telegram_connection
+from app.utils.logging_utils import log_request_blueprint, log_response_blueprint
+import logging
 
 telegram_api_bp = Blueprint('telegram_api', __name__, url_prefix='/api/telegram')
+logger = logging.getLogger('pyring.api.telegram')
+
+@telegram_api_bp.before_request
+def log_api_request():
+    log_request_blueprint('pyring.api')
+
+@telegram_api_bp.after_request
+def log_api_response(response):
+    return log_response_blueprint(response, 'pyring.api')
 
 @telegram_api_bp.before_request
 def token_required():

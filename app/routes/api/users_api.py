@@ -2,15 +2,20 @@ from flask import Blueprint, jsonify, request, make_response, redirect, url_for
 from app.services.db_service import change_password, get_user_by_email, add_user, get_user
 from app.utils.jwt_utils import verify_jwt, generate_jwt, blacklist_token
 from argon2 import PasswordHasher, exceptions as argon2_exceptions
+import logging
+from app.utils.logging_utils import log_request_blueprint, log_response_blueprint
 
 users_api_bp = Blueprint('users_api', __name__, url_prefix='/api/users')
 ph = PasswordHasher()
+logger = logging.getLogger('pyring.api.users')
 
-# @users_api_bp.before_request
-# def token_required():
-#     token = request.cookies.get('token')  # Get JWT token from cookies
-#     if not token or not verify_jwt(token):  # Verify JWT token
-#         return jsonify({"msg": "Unauthorized"}), 401
+@users_api_bp.before_request
+def log_api_request():
+    log_request_blueprint('pyring.api')
+
+@users_api_bp.after_request
+def log_api_response(response):
+    return log_response_blueprint(response, 'pyring.api')
 
 @users_api_bp.route('/change_password', methods=['POST'])
 def change_password_route():
@@ -90,7 +95,7 @@ def login_route():
 @users_api_bp.route('/register', methods=['POST'])
 def register_route():
     # Register a new user
-    try:
+    try:        
         # If there's already a user, return an error
         user = list(get_user())
         if user:
@@ -135,8 +140,13 @@ def logout_route():
     # Logout a user
     token = request.cookies.get('token')  # Get JWT token from cookies
     if token and verify_jwt(token):
+        decoded_token = verify_jwt(token)
+        email = decoded_token.get('email') if decoded_token else 'Unknown'
+        
         blacklist_token(token)  # Blacklist the token
+        
         response = make_response(redirect(url_for('web.index')))
         response.delete_cookie('token')  # Remove the JWT token from cookies
         return response
+    
     return jsonify({"msg": "Invalid token"}), 400

@@ -30,8 +30,12 @@ RUN mkdir -p /var/www/app/.gnupg
 # Create the .pgp directory
 RUN mkdir -p /var/www/app/.pgp
 
-# Change permissions of the .gnupg and .pgp directories
+# Create the logs directory
+RUN mkdir -p /var/www/app/logs
+
+# Change permissions of the .gnupg, .pgp, and logs directories
 RUN chmod 700 /var/www/app/.gnupg /var/www/app/.pgp
+RUN chmod 755 /var/www/app/logs
 
 # Generate server PGP keypair directly in the container (should work with Debian's GnuPG)
 RUN echo "Key-Type: RSA\nKey-Length: 2048\nName-Real: Server\nName-Email: server@example.com\nExpire-Date: 0\n%no-protection\n%commit" > /tmp/keyparams && \
@@ -42,8 +46,8 @@ RUN echo "Key-Type: RSA\nKey-Length: 2048\nName-Real: Server\nName-Email: server
 RUN FPR=$(gpg --homedir /var/www/app/.gnupg --list-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}') && \
     gpg --homedir /var/www/app/.gnupg --export --armor "$FPR" > /var/www/app/.pgp/server_pub.asc
 
-# Change ownership of the .gnupg and .pgp directories to the non-root user
-RUN chown -R www:www /var/www/app/.gnupg /var/www/app/.pgp
+# Change ownership of the directories to the non-root user
+RUN chown -R www:www /var/www/app/.gnupg /var/www/app/.pgp /var/www/app/logs
 
 RUN pip install -r app/requirements.txt
 

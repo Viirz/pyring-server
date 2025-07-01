@@ -4,8 +4,19 @@ from app.utils.request_utils import sanitize_input, validate_request_data
 from app.services.db_service import update_agents, get_unretrieved_commands_by_uuid, update_command_response
 from app.utils.pgp_utils import verify_and_decrypt_status, sign_and_encrypt_command
 from app.utils.agent_utils import update_agent_with_notification
+from app.utils.logging_utils import log_request_blueprint, log_response_blueprint
+import logging
 
 agents_bp = Blueprint('agents', __name__)
+logger = logging.getLogger('pyring.agent.agents')
+
+@agents_bp.before_request
+def log_agent_request():
+    log_request_blueprint('pyring.agent')
+
+@agents_bp.after_request
+def log_agent_response(response):
+    return log_response_blueprint(response, 'pyring.agent')
 
 @agents_bp.route('/agents', methods=['POST'])
 def receive_status():
