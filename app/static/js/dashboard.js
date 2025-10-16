@@ -66,9 +66,9 @@ function openCredentialsModal(data) {
   credentialData = typeof data === 'string' ? JSON.parse(data) : data;
   
   // Populate the credential items
+  document.getElementById('agentUuid').textContent = credentialData.uuid;
   document.getElementById('agentPrivateKey').textContent = credentialData.agent_private_key;
   document.getElementById('serverPublicKey').textContent = credentialData.server_public_key;
-  document.getElementById('agentUuid').textContent = credentialData.uuid;
   
   // Reset to first credential
   currentCredentialIndex = 0;

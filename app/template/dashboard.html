@@ -134,27 +134,28 @@
                <button class="card-close" onclick="closeCredentialsModal()">&times;</button>
             </div>
             <div class="credential-card-body">
-               <div class="credential-item active" data-index="0">
-                  <div class="credential-label">Agent Private Key</div>
-                  <div class="credential-content" id="agentPrivateKey"></div>
-                  <div class="credential-actions">
-                     <button class="copy-btn" onclick="copyToClipboard('agentPrivateKey', this)">Copy</button>
-                  </div>
-               </div>
-               <div class="credential-item" data-index="1">
-                  <div class="credential-label">Server Public Key</div>
-                  <div class="credential-content" id="serverPublicKey"></div>
-                  <div class="credential-actions">
-                     <button class="copy-btn" onclick="copyToClipboard('serverPublicKey', this)">Copy</button>
-                  </div>
-               </div>
-               <div class="credential-item" data-index="2">
+               <div class="credential-item" data-index="0">
                   <div class="credential-label">Agent UUID</div>
                   <div class="credential-content" id="agentUuid"></div>
                   <div class="credential-actions">
                      <button class="copy-btn" onclick="copyToClipboard('agentUuid', this)">Copy</button>
                   </div>
                </div>
+               <div class="credential-item active" data-index="1">
+                  <div class="credential-label">Agent Private Key</div>
+                  <div class="credential-content" id="agentPrivateKey"></div>
+                  <div class="credential-actions">
+                     <button class="copy-btn" onclick="copyToClipboard('agentPrivateKey', this)">Copy</button>
+                  </div>
+               </div>
+               <div class="credential-item" data-index="2">
+                  <div class="credential-label">Server Public Key</div>
+                  <div class="credential-content" id="serverPublicKey"></div>
+                  <div class="credential-actions">
+                     <button class="copy-btn" onclick="copyToClipboard('serverPublicKey', this)">Copy</button>
+                  </div>
+               </div>
+               
             </div>
             <div class="credential-navigation">
                <button class="nav-btn" id="prevBtn" onclick="previousCredential()" disabled>Previous</button>
