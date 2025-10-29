@@ -97,7 +97,7 @@ def login_route():
         # Generate JWT token with role
         token = generate_jwt(email, role)
         response = jsonify({"msg": "Login successful"})
-        response.set_cookie('token', token, secure=False, httponly=True, samesite='Strict')  # Store JWT token in cookies
+        response.set_cookie('token', token, secure=True, httponly=True, samesite='Strict')  # Store JWT token in cookies
         return response, 200
     except Exception as e:
         return jsonify({"msg": f"Something went wrong: {e}"}), 500
