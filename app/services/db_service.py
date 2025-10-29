@@ -173,21 +173,58 @@ def delete_agent_by_uuid(uuid: str):
         return e
 
 # Telegram notification functions
-def get_telegram_settings():
+def get_telegram_settings() -> dict:
     try:
-        settings = db.telegram_settings.find_one({}, {"_id": 0})
-        return settings
+        # Get the first (and only) user's telegram settings
+        user = db.users.find_one()
+        if user:
+            return {
+                "enabled": user.get("telegram_enabled", False),
+                "bot_token": user.get("telegram_bot_token", ""),
+                "chat_id": user.get("telegram_chat_id", ""),
+                "thread_id": user.get("telegram_thread_id", "")
+            }
+        return {
+            "enabled": False,
+            "bot_token": "",
+            "chat_id": "",
+            "thread_id": ""
+        }
     except Exception as e:
-        return None
+        return e
 
 def update_telegram_settings(settings_data: dict):
     try:
-        # Use upsert to update or create if doesn't exist
-        db.telegram_settings.update_one(
-            {},  # Empty filter to match any document
-            {"$set": settings_data},
-            upsert=True
+        user = db.users.find_one()
+        if not user:
+            raise Exception("User not found")
+        
+        update_data = {
+            "telegram_enabled": settings_data.get("enabled", False),
+            "telegram_bot_token": settings_data.get("bot_token", ""),
+            "telegram_chat_id": settings_data.get("chat_id", "")
+        }
+        
+        # Only add thread_id if it's provided and not empty
+        thread_id = settings_data.get("thread_id", "").strip()
+        if thread_id:
+            update_data["telegram_thread_id"] = thread_id
+        else:
+            # Remove thread_id if empty
+            db.users.update_one(
+                {"_id": user["_id"]},
+                {"$unset": {"telegram_thread_id": ""}}
+            )
+            # Update other fields
+            db.users.update_one(
+                {"_id": user["_id"]},
+                {"$set": update_data}
+            )
+            return
+        
+        db.users.update_one(
+            {"_id": user["_id"]},
+            {"$set": update_data}
         )
-        return True
     except Exception as e:
         return e

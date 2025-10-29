@@ -12,6 +12,7 @@ def send_telegram_notification(agent_name, agent_uuid, old_status, new_status):
         
         bot_token = settings.get('bot_token')
         chat_id = settings.get('chat_id')
+        thread_id = settings.get('thread_id', '')  # Optional thread_id
         
         if not bot_token or not chat_id:
             print("Telegram bot token or chat ID not configured", flush=True)
@@ -48,6 +49,10 @@ def send_telegram_notification(agent_name, agent_uuid, old_status, new_status):
             'parse_mode': 'Markdown'
         }
         
+        # Add thread_id if provided
+        if thread_id:
+            payload['message_thread_id'] = thread_id
+        
         response = requests.post(url, json=payload, timeout=10)
         
         if response.status_code == 200:
@@ -58,12 +63,7 @@ def send_telegram_notification(agent_name, agent_uuid, old_status, new_status):
     except Exception as e:
         print(f"Error sending Telegram notification: {e}", flush=True)
 
-def get_current_time():
-    """Get current time formatted for notifications"""
-    from datetime import datetime
-    return datetime.now().strftime('%d/%m/%Y - %H:%M:%S')
-
-def test_telegram_connection(bot_token, chat_id):
+def test_telegram_connection(bot_token, chat_id, thread_id=None):
     """Test Telegram bot connection"""
     try:
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -72,6 +72,10 @@ def test_telegram_connection(bot_token, chat_id):
             'text': '🔧 **PyRing Server Test**\n\nTelegram notifications are working correctly!',
             'parse_mode': 'Markdown'
         }
+        
+        # Add thread_id if provided
+        if thread_id:
+            payload['message_thread_id'] = thread_id
         
         response = requests.post(url, json=payload, timeout=10)
         
@@ -82,3 +86,8 @@ def test_telegram_connection(bot_token, chat_id):
             
     except Exception as e:
         return {"success": False, "message": f"Connection error: {str(e)}"}
+
+def get_current_time():
+    """Get current time formatted for notifications"""
+    from datetime import datetime
+    return datetime.now().strftime('%d/%m/%Y - %H:%M:%S')

@@ -55,13 +55,15 @@
             </div>
           </label>
         </div>
-
-        <div id="telegram-config" class="telegram-config">
+                <div id="telegram-config" class="telegram-config">
           <label>Bot Token</label>
           <input type="text" id="bot-token" placeholder="Enter your Telegram bot token" />
           
           <label>Chat ID</label>
           <input type="text" id="chat-id" placeholder="Enter your chat ID" />
+          
+          <label>Thread ID (Optional)</label>
+          <input type="text" id="thread-id" placeholder="Enter thread ID for forum topics (optional)" />
           
           <div class="button-group">
             <button type="button" class="btn-test" onclick="testTelegramConnection()">Test Connection</button>
@@ -135,13 +137,17 @@
         // Set chat ID
         document.getElementById('chat-id').value = settings.chat_id || '';
         
+        // Set thread ID (new field)
+        document.getElementById('thread-id').value = settings.thread_id || '';
+        
         // Update UI visibility AFTER setting the checkbox value
         toggleTelegramConfig();
         
         console.log('Telegram settings loaded:', {
           enabled: settings.enabled,
           botTokenConfigured: telegramConfigured,
-          chatId: settings.chat_id
+          chatId: settings.chat_id,
+          threadId: settings.thread_id
         });
       } else {
         console.error('Failed to load Telegram settings:', response.status);
@@ -194,6 +200,7 @@
       // When disabling, we preserve existing credentials but set enabled = false
       const botToken = document.getElementById('bot-token').value;
       const chatId = document.getElementById('chat-id').value;
+      const threadId = document.getElementById('thread-id').value;
 
       const response = await fetch('/api/telegram/settings', {
         method: 'POST',
@@ -203,7 +210,8 @@
         body: JSON.stringify({
           enabled: false,  // Always false when auto-saving disable
           bot_token: botToken,
-          chat_id: chatId
+          chat_id: chatId,
+          thread_id: threadId
         }),
         credentials: 'include'
       });
@@ -237,6 +245,7 @@
   async function testTelegramConnection() {
     const botToken = document.getElementById('bot-token').value;
     const chatId = document.getElementById('chat-id').value;
+    const threadId = document.getElementById('thread-id').value;
 
     if (!botToken || !chatId) {
       alert('Please enter both bot token and chat ID');
@@ -257,7 +266,8 @@
         },
         body: JSON.stringify({
           bot_token: botToken,
-          chat_id: chatId
+          chat_id: chatId,
+          thread_id: threadId
         }),
         credentials: 'include'
       });
@@ -282,6 +292,7 @@
     const enabled = document.getElementById('telegram-enabled').checked;
     const botToken = document.getElementById('bot-token').value;
     const chatId = document.getElementById('chat-id').value;
+    const threadId = document.getElementById('thread-id').value;
 
     if (enabled && (!botToken || !chatId)) {
       alert('Please enter both bot token and chat ID when enabling notifications');
@@ -303,7 +314,8 @@
         body: JSON.stringify({
           enabled: enabled,
           bot_token: botToken,
-          chat_id: chatId
+          chat_id: chatId,
+          thread_id: threadId
         }),
         credentials: 'include'
       });

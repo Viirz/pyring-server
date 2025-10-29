@@ -98,6 +98,7 @@ def test_connection():
 
         bot_token = data.get("bot_token", "").strip()
         chat_id = data.get("chat_id", "").strip()
+        thread_id = data.get("thread_id", "").strip()  # Optional
         
         if not bot_token or not chat_id:
             return jsonify({"msg": "Bot token and chat ID are required"}), 400
@@ -110,7 +111,8 @@ def test_connection():
             else:
                 return jsonify({"msg": "No bot token configured"}), 400
         
-        result = test_telegram_connection(bot_token, chat_id)
+        # Pass thread_id to test function (None if empty)
+        result = test_telegram_connection(bot_token, chat_id, thread_id if thread_id else None)
         
         if result["success"]:
             return jsonify(result), 200
