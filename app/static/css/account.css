@@ -223,7 +223,7 @@ input:checked + .slider:before {
 
 /* Form */
 form input {
-  width: 100%;
+  width: 95%;
   padding: 10px;
   margin-bottom: 16px;
   border: 1px solid #ccc;

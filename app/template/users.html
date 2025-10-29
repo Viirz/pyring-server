@@ -5,19 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Users Management</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}" />
-  <style>
-    /* Minimal table + button styles specific to this page */
-    .users-card { background: #fff; border-radius: 8px; padding: 16px; }
-    .users-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .users-table { width: 100%; border-collapse: collapse; }
-    .users-table th, .users-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
-    .users-table th { background: #f8f9fa; }
-    .btn-green { background: #28a745; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-    .btn-green:hover { background: #218838; }
-    .btn-red { background: #dc3545; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-    .btn-red:hover { background: #c82333; }
-    .hidden { display: none; }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/users.css') }}" />
 </head>
 <body>
   <header class="navbar">
@@ -35,7 +23,10 @@
     </nav>
   </header>
 
-  <main class="settings-container">
+  <main class="settings-container" id="usersPage"
+        data-list-url="{{ url_for('users_api.list_users_route') }}"
+        data-create-url="{{ url_for('users_api.create_user_route') }}"
+        data-delete-url-template="{{ url_for('users_api.delete_user_route', email='__EMAIL__') }}">
     <div class="settings-card users-card">
       <div class="users-header">
         <div>
@@ -78,121 +69,12 @@
           <option value="admin">admin</option>
           <option value="super-admin">super-admin</option>
         </select>
-        <div style="margin-top: 12px;">
+        <div class="mt-12">
           <button class="btn-save" onclick="createUser()">Create</button>
         </div>
       </div>
     </div>
   </main>
-
-  <script>
-    async function loadUsers() {
-      try {
-        const resp = await fetch('{{ url_for("users_api.list_users_route") }}', {
-          method: 'GET',
-          credentials: 'include'
-        });
-        const data = await resp.json();
-        if (!resp.ok) {
-          alert(data.msg || 'Failed to load users');
-          return;
-        }
-        const tbody = document.getElementById('usersTableBody');
-        tbody.innerHTML = '';
-        data.forEach(u => {
-          const tr = document.createElement('tr');
-
-          const nameTd = document.createElement('td');
-          nameTd.textContent = u.name || '';
-          tr.appendChild(nameTd);
-
-          const emailTd = document.createElement('td');
-          emailTd.textContent = u.email || '';
-          tr.appendChild(emailTd);
-
-          const roleTd = document.createElement('td');
-          roleTd.textContent = u.role || 'user';
-          tr.appendChild(roleTd);
-
-          const actionTd = document.createElement('td');
-          actionTd.style.textAlign = 'center';
-          const delBtn = document.createElement('button');
-          delBtn.className = 'btn-red';
-          delBtn.textContent = 'Delete';
-          delBtn.onclick = () => deleteUser(u.email);
-          actionTd.appendChild(delBtn);
-          tr.appendChild(actionTd);
-
-          tbody.appendChild(tr);
-        });
-      } catch (e) {
-        alert('Error: ' + e.message);
-      }
-    }
-
-    function toggleCreate() {
-      const card = document.getElementById('createUserCard');
-      card.classList.toggle('hidden');
-    }
-
-    async function createUser() {
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const repeat_password = document.getElementById('repeat_password').value;
-      const role = document.getElementById('role').value;
-
-      if (!name || !email || !password || !repeat_password || !role) {
-        alert('All fields are required');
-        return;
-      }
-
-      try {
-        const resp = await fetch('{{ url_for("users_api.create_user_route") }}', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ name, email, password, repeat_password, role })
-        });
-        const result = await resp.json();
-        if (resp.ok) {
-          alert('User created');
-          // Reset form
-          document.getElementById('name').value = '';
-          document.getElementById('email').value = '';
-          document.getElementById('password').value = '';
-          document.getElementById('repeat_password').value = '';
-          document.getElementById('role').value = 'user';
-          // Hide card and refresh list
-          document.getElementById('createUserCard').classList.add('hidden');
-          loadUsers();
-        } else {
-          alert(result.msg || 'Failed to create user');
-        }
-      } catch (e) {
-        alert('Error: ' + e.message);
-      }
-    }
-
-    async function deleteUser(email) {
-      if (!confirm(`Delete user "${email}"? This action cannot be undone.`)) return;
-      try {
-        const resp = await fetch(`{{ url_for("users_api.delete_user_route", email="__EMAIL__") }}`.replace('__EMAIL__', encodeURIComponent(email)), {
-          method: 'DELETE',
-          credentials: 'include'
-        });
-        const result = await resp.json();
-        if (resp.ok) {
-          loadUsers();
-        } else {
-          alert(result.msg || 'Failed to delete user');
-        }
-      } catch (e) {
-        alert('Error: ' + e.message);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', loadUsers);
-  </script>
+  <script src="{{ url_for('static', filename='js/users.js') }}"></script>
 </body>
 </html>

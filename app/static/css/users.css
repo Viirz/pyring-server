@@ -1,0 +1,160 @@
+/* Users Management Page Styles */
+
+.users-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+.users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.users-header h3 {
+  margin: 0 0 4px 0;
+}
+
+.users-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.users-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  z-index: 1;
+}
+
+.users-table th, .users-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.users-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.btn-green {
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all .15s ease-in-out;
+}
+
+.btn-green:hover { background: #16a34a; transform: translateY(-1px); }
+
+.btn-red {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all .15s ease-in-out;
+}
+
+.btn-red:hover { background: #dc2626; transform: translateY(-1px); }
+
+.hidden { display: none; }
+
+.mt-12 { margin-top: 12px; }
+
+/* Animate the create card show/hide */
+#createUserCard {
+  transition: opacity .2s ease, transform .2s ease;
+}
+#createUserCard.hidden {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+#createUserCard:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Create User card enhancements */
+#createUserCard {
+  max-width: 560px;
+  margin: 16px auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  border: 1px solid #eef2f7;
+}
+
+#createUserCard h3 {
+  margin: 4px 0 12px 0;
+}
+
+#createUserCard .telegram-settings {
+  display: grid;
+  gap: 10px;
+}
+
+#createUserCard label {
+  font-weight: 600;
+  color: #374151;
+}
+
+#createUserCard input,
+#createUserCard select {
+  width: 95%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease;
+  outline: none;
+}
+
+#createUserCard input::placeholder {
+  color: #9ca3af;
+}
+
+#createUserCard input:focus,
+#createUserCard select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+#createUserCard .mt-12 {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+#createUserCard .btn-save {
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: .2px;
+  transition: all .15s ease-in-out;
+}
+
+#createUserCard .btn-save:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+}
+
