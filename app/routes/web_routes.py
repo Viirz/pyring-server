@@ -48,6 +48,7 @@ def dashboard():
         return redirect(url_for('web.login'))  # Redirect to login if token is invalid
 
     email = decoded_token.get('email') if decoded_token else None
+    role = decoded_token.get('role', 'user')
     
     # Check if the jwt token contains the email
     if not email:
@@ -82,8 +83,8 @@ def dashboard():
             counts[status] += 1
         counts["all"] += 1  # Increment the total count
 
-    # Pass the agents and counts to the template
-    return render_template("dashboard.html", agents=agents, counts=counts)
+    # Pass the agents, counts and role to the template
+    return render_template("dashboard.html", agents=agents, counts=counts, role=role)
 
 @web_bp.route('/logout')
 def logout():
@@ -91,7 +92,8 @@ def logout():
     if token and verify_jwt(token):
         blacklist_token(token) # Blacklist the token
         response = make_response(redirect(url_for('web.index')))
-        response.delete_cookie('token')  # Remove the JWT token from cookies
+        # Remove the JWT token from cookies; mirror attributes for reliable deletion
+        response.delete_cookie('token', samesite='Strict')
         return response
 
     return make_response(jsonify({"msg": "Invalid or missing token"}), 401)
@@ -104,6 +106,7 @@ def account():
     
     decoded_token = verify_jwt(token)
     email = decoded_token.get('email') if decoded_token else None
+    role = decoded_token.get('role', 'user')
     if not email:
         return redirect(url_for('web.login'))
     
@@ -111,14 +114,20 @@ def account():
     if not user or not any(u['email'] == email for u in user):
         return make_response(jsonify({"msg": "Invalid email"}), 401)
     
-    return render_template("account.html", email=email)
+    return render_template("account.html", email=email, role=role)
 
 @web_bp.route('/agent/<uuid>', methods=['GET'])
 def agent_detail(uuid):
     # Validate JWT token
     token = request.cookies.get('token')  # Get JWT token from cookies
-    if not token or not verify_jwt(token):  # Verify JWT token
+    decoded = verify_jwt(token)
+    if not token or not decoded:  # Verify JWT token
         return redirect(url_for('web.login'))  # Redirect to login if token is invalid
+
+    role = decoded.get('role', 'user')
+    if role == 'user':
+        # Users are not allowed to see agent detail
+        return redirect(url_for('web.dashboard'))
 
     # Validate UUID and fetch agent data
     try:
@@ -138,6 +147,18 @@ def agent_detail(uuid):
             agent['last_handshake'] = 'N/A'  # Default to 'null' if the field is missing or None
         
         # Render the agent.html template with the agent data
-        return render_template("agent.html", agent=agent)
+        return render_template("agent.html", agent=agent, role=role)
     except Exception as e:
         return make_response(jsonify({"msg": f"Something went wrong: {e}"}), 500)
+
+# Users management page (super-admin only)
+@web_bp.route('/users', methods=['GET'])
+def users_page():
+    token = request.cookies.get('token')
+    decoded = verify_jwt(token)
+    if not token or not decoded:
+        return redirect(url_for('web.login'))
+    role = decoded.get('role', 'user')
+    if role != 'super-admin':
+        return redirect(url_for('web.dashboard'))
+    return render_template("users.html")

@@ -1,6 +1,14 @@
 from flask import Blueprint, jsonify, request, make_response, redirect, url_for
-from app.services.db_service import change_password, get_user_by_email, add_user, get_user
-from app.utils.jwt_utils import verify_jwt, generate_jwt, blacklist_token
+from app.services.db_service import (
+    change_password,
+    get_user_by_email,
+    add_user,
+    get_user,
+    get_users,
+    update_user_role,
+    delete_user_by_email,
+)
+from app.utils.jwt_utils import verify_jwt, generate_jwt, blacklist_token, require_roles
 from argon2 import PasswordHasher, exceptions as argon2_exceptions
 import logging
 from app.utils.logging_utils import log_request_blueprint, log_response_blueprint
@@ -83,18 +91,20 @@ def login_route():
             ph.verify(user['password'], password)  # Verify password
         except argon2_exceptions.VerifyMismatchError:
             return jsonify({"msg": "Invalid email or password"}), 401
-        
-        # Generate JWT token
-        token = generate_jwt(email)
+
+        # Determine role; default to 'user' if missing
+        role = user.get('role', 'user')
+        # Generate JWT token with role
+        token = generate_jwt(email, role)
         response = jsonify({"msg": "Login successful"})
-        response.set_cookie('token', token, secure=True, httponly=True)  # Store JWT token in cookies
+        response.set_cookie('token', token, secure=False, httponly=True, samesite='Strict')  # Store JWT token in cookies
         return response, 200
     except Exception as e:
         return jsonify({"msg": f"Something went wrong: {e}"}), 500
     
 @users_api_bp.route('/register', methods=['POST'])
 def register_route():
-    # Register a new user
+    # Register a new user (first user only)
     try:        
         # If there's already a user, return an error
         user = list(get_user())
@@ -124,11 +134,12 @@ def register_route():
         # Hash the password
         password_hash = ph.hash(password)
 
-        # Call the add_user function to create a new user
+        # First user is super-admin
         user_data = {
             "email": email,
             "name": name,
-            "password": password_hash
+            "password": password_hash,
+            "role": "super-admin",
         }
         add_user(user_data)
         return jsonify({"msg": "User registered successfully"}), 201
@@ -150,3 +161,78 @@ def logout_route():
         return response
     
     return jsonify({"msg": "Invalid token"}), 400
+
+
+# ---------------- Super-admin only user management ----------------
+
+@users_api_bp.route('/', methods=['GET'])
+@require_roles('super-admin')
+def list_users_route():
+    try:
+        users = list(get_users())
+        return jsonify([
+            {"email": u.get("email"), "name": u.get("name"), "role": u.get("role", "user")}
+            for u in users
+        ]), 200
+    except Exception as e:
+        return jsonify({"msg": f"Something went wrong: {e}"}), 500
+
+
+@users_api_bp.route('/create', methods=['POST'])
+@require_roles('super-admin')
+def create_user_route():
+    try:
+        data = request.get_json() or {}
+        email = (data.get("email") or '').strip()
+        name = (data.get("name") or '').strip()
+        password = data.get("password") or ''
+        repeat_password = data.get("repeat_password") or ''
+        role = (data.get("role") or 'user').strip()
+
+        if not email or not name or not password or not repeat_password or not role:
+            return jsonify({"msg": "All fields are required"}), 400
+        if password != repeat_password:
+            return jsonify({"msg": "Passwords do not match"}), 400
+        if role not in ["super-admin", "admin", "user"]:
+            return jsonify({"msg": "Invalid role"}), 400
+        if get_user_by_email(email):
+            return jsonify({"msg": "User already exists"}), 400
+
+        password_hash = ph.hash(password)
+        add_user({
+            "email": email,
+            "name": name,
+            "password": password_hash,
+            "role": role,
+        })
+        return jsonify({"msg": "User created successfully"}), 201
+    except Exception as e:
+        return jsonify({"msg": f"Something went wrong: {e}"}), 500
+
+
+@users_api_bp.route('/<email>/role', methods=['PUT'])
+@require_roles('super-admin')
+def update_user_role_route(email):
+    try:
+        data = request.get_json() or {}
+        role = (data.get("role") or '').strip()
+        if role not in ["super-admin", "admin", "user"]:
+            return jsonify({"msg": "Invalid role"}), 400
+        result = update_user_role(email, role)
+        if isinstance(result, Exception):
+            return jsonify({"msg": str(result)}), 500
+        return jsonify({"msg": "Role updated successfully"}), 200
+    except Exception as e:
+        return jsonify({"msg": f"Something went wrong: {e}"}), 500
+
+
+@users_api_bp.route('/<email>', methods=['DELETE'])
+@require_roles('super-admin')
+def delete_user_route(email):
+    try:
+        result = delete_user_by_email(email)
+        if isinstance(result, Exception):
+            return jsonify({"msg": str(result)}), 500
+        return jsonify({"msg": "User deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"msg": f"Something went wrong: {e}"}), 500

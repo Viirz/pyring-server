@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from app.services.db_service import insert_command, get_top_commands_by_uuid, get_user_by_email
 from app.utils.jwt_utils import verify_jwt
+from app.utils.jwt_utils import require_roles
 from app.utils.agent_utils import add_agents, delete_agent
 from app.utils.logging_utils import log_request_blueprint, log_response_blueprint
 import uuid as uuid_gen
@@ -30,6 +31,7 @@ def token_required():
         return jsonify({"msg": "Unauthorized"}), 401
 
 @agents_api_bp.route('/', methods=['POST'])
+@require_roles('admin', 'super-admin')
 def create_new_agents():
     try:
         data = request.get_json()
@@ -91,6 +93,7 @@ def create_new_agents():
         return jsonify({"msg": f"Something went wrong: {e}"}), 500
     
 @agents_api_bp.route('/<uuid>/command', methods=['POST', 'GET'])
+@require_roles('admin', 'super-admin')
 def handle_agent_command(uuid):
     try:
         if request.method == 'GET':
@@ -146,6 +149,7 @@ def handle_agent_command(uuid):
         return jsonify({"msg": f"Something went wrong: {e}"}), 500
 
 @agents_api_bp.route('/<uuid>', methods=['DELETE'])
+@require_roles('admin', 'super-admin')
 def delete_agent_endpoint(uuid):
     try:
         logger.info(f"Attempting to delete agent {uuid}")

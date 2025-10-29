@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from app.services.db_service import get_telegram_settings, update_telegram_settings, get_user_by_email
 from app.utils.jwt_utils import verify_jwt
+from app.utils.jwt_utils import require_roles
 from app.utils.telegram_utils import test_telegram_connection
 from app.utils.logging_utils import log_request_blueprint, log_response_blueprint
 import logging
@@ -23,6 +24,7 @@ def token_required():
         return jsonify({"msg": "Unauthorized"}), 401
 
 @telegram_api_bp.route('/settings', methods=['GET'])
+@require_roles('admin', 'super-admin')
 def get_settings():
     try:
         settings = get_telegram_settings()
@@ -43,6 +45,7 @@ def get_settings():
         return jsonify({"msg": f"Something went wrong: {e}"}), 500
 
 @telegram_api_bp.route('/settings', methods=['POST'])
+@require_roles('admin', 'super-admin')
 def update_settings():
     try:
         data = request.get_json()
@@ -90,6 +93,7 @@ def update_settings():
         return jsonify({"msg": f"Something went wrong: {e}"}), 500
 
 @telegram_api_bp.route('/test', methods=['POST'])
+@require_roles('admin', 'super-admin')
 def test_connection():
     try:
         data = request.get_json()

@@ -65,6 +65,13 @@ def get_user() -> dict:
         return db.users.find()
     except Exception as e:
         return e
+
+# List all users
+def get_users() -> dict:
+    try:
+        return db.users.find()
+    except Exception as e:
+        return e
     
 def get_user_by_email(email: str) -> dict:
     try:
@@ -84,6 +91,22 @@ def change_password(email: str, new_password: str):
 def add_user(user_data: dict):
     try:
         db.users.insert_one(user_data)
+    except Exception as e:
+        return e
+
+# Update an existing user's role
+def update_user_role(email: str, role: str):
+    try:
+        db.users.update_one({"email": email}, {"$set": {"role": role}})
+        return True
+    except Exception as e:
+        return e
+
+# Delete a user by email
+def delete_user_by_email(email: str):
+    try:
+        db.users.delete_one({"email": email})
+        return True
     except Exception as e:
         return e
     

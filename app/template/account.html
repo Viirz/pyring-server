@@ -13,6 +13,11 @@
       <a href="{{ url_for('web.dashboard') }}" class="active">
         <img src="{{ url_for('static', filename='img/dashboard.png') }}" alt="Dashboard Icon" class="icon"> Dashboard
       </a>
+      {% if role == 'super-admin' %}
+      <a href="{{ url_for('web.users_page') }}">
+        <img src="{{ url_for('static', filename='img/user.png') }}" alt="Users Icon" class="icon"> Users
+      </a>
+      {% endif %}
       <a href="{{ url_for('web.account') }}">
         <img src="{{ url_for('static', filename='img/user.png') }}" alt="User Icon" class="icon"> User
       </a>
